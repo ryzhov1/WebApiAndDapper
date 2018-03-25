@@ -1,0 +1,8 @@
+﻿DELETE FROM accounts
+DBCC CHECKIDENT ('accounts',RESEED, 0)
+
+DELETE FROM banks
+DBCC CHECKIDENT ('banks',RESEED, 0)
+
+DELETE FROM contragents
+DBCC CHECKIDENT ('contragents',RESEED, 0)

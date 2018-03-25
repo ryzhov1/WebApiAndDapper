@@ -1,0 +1,40 @@
+﻿<h2>@ViewBag.Title</h2>
+<div>
+    <input type="file" name="upload" id="uploadFile" accept="text/plain,application/plain"/><br />
+    <button id="submit">Загрузить</button>
+</div>
+
+@section scripts{
+    <script type="text/javascript">
+
+        $('#submit').on('click', function (e) {
+            e.preventDefault();
+            var files = document.getElementById('uploadFile').files;
+            if (files.length > 0) {
+                if (window.FormData !== undefined) {
+                    var data = new FormData();
+                    for (var x = 0; x < files.length; x++) {
+                        data.append("file" + x, files[x]);
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: '/api/upload/post',
+                        contentType: false,
+                        processData: false,
+                        data: data,
+                        success: function (data) {
+                            //alert(data);
+                            window.location.href = data.redirecturl;
+                        },
+                        error: function (xhr, status, p3) {
+                            alert(xhr.responseText);
+                        }
+                    });
+                } else {
+                    alert("Браузер не поддерживает загрузку файлов HTML5!");
+                }
+            }
+        });
+    </script>
+}

@@ -1,0 +1,127 @@
+﻿<h2>@ViewBag.Title</h2>
+<div id="main-content">
+    <div id="tablePreview"></div>
+    <div id="datailInfo">
+        <p><b>Карточка контрагента</b></p>
+        <div id="detailContragentMain"></div>
+    </div>
+    <div class="clear"></div>
+</div>
+@section scripts
+{
+<script type="text/javascript">
+        $(document).ready(function () {
+
+            Initialize();
+
+        });
+
+        $(document).mousemove(function (e) {
+            window.x = e.pageX;
+            window.y = e.pageY;
+        });
+
+        function Initialize() {
+            $("#datailInfo").css('display', 'none');
+
+            $.ajax({
+                url: '/api/contragents/',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    WriteContragents(data);
+                },
+                error: function (xhr, status, p3) {
+                    alert(xhr.responseText);
+                }
+                });
+
+            $("#detailItem").click(function (event) {
+                event.preventDefault();
+                DetailItem();
+            });
+
+        }
+
+        function WriteContragents(contragents) {
+
+            var strResult = "<h4>Контрагенты не найдены.</h4>" + '<a href="@Url.Action("Upload")">Перейти к импорту</a>';
+            if (contragents.length > 0) {
+                strResult = "<table><th>Наименование</th><th>ИНН</th><th>КПП</th><th>&nbsp;</th>";
+                $.each(contragents, function (index, contragent) {
+                    strResult += "<tr><td>" + contragent.Name +
+                        "</td><td> " + contragent.INN +
+                        "</td><td>" + contragent.KPP + "</td><td>" +
+                        "<a id='detailItem' data-contragent='" + JSON.stringify(contragent) + "' onclick='DetailItem(this);' >Карточка</a></td></tr>";
+                });
+                strResult += "</table>";
+            }
+
+            $("#tablePreview").html(strResult);
+
+        }
+
+        function DetailItem(el) {
+            var contragent = $(el).data('contragent');
+
+            GetContragentAccounts(contragent, contragent.Id);
+        }
+
+        function GetContragentAccounts(contragent, id) {
+            $.ajax({
+                url: '/api/ContragentAccounts/' + id,
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    contragent.Accounts = data;
+                    ShowItem(contragent);
+                },
+                error: function (xhr, status, p3) {
+                    alert(xhr.responseText);
+                }
+            });
+        }
+
+        function ShowItem(contragent) {
+            var table = $("#tablePreview");
+            var tablePosition = table.position();
+
+            if (contragent != null) {
+                $("#datailInfo").css("margin-top", (y - 150));
+                $("#datailInfo").css('display', 'block');
+
+                var strResult = "<table>";
+                strResult += "<tr><td>Наименование</td><td>" + contragent.Name + "</td><tr>";
+                strResult += "<tr><td>ИНН</td><td>" + contragent.INN + "</td><tr>";
+                strResult += "<tr><td>КПП</td><td>" + contragent.KPP + "</td><tr>";
+                strResult += "</table>";
+
+                var AccountCount = contragent.Accounts.length;
+
+                $.each(contragent.Accounts, function (index, account) {
+
+                    if (AccountCount == 1) {
+                        strResult += "<p><b>Информация о счёте</b></p>";
+                    }
+                    else {
+                        strResult += "<p><b>Информация о счёте №" + (index + 1) + "</b></p>";
+                    }
+
+                    strResult += "<table>";
+                    strResult += "<tr><td>Номер</td><td>" + account.Number + "</td><tr>";
+                    strResult += "<tr><td>Банк</td><td>" + account.Bank.Name + "</td><tr>";
+                    strResult += "<tr><td>БИК</td><td>" + account.Bank.Bic + "</td><tr>";
+                    strResult += "<tr><td>К/счёт</td><td>" + account.Bank.CorrespondingAccount + "</td><tr>";
+                    strResult += "</table>";
+                });
+
+
+                $("#detailContragentMain").html(strResult);
+            }
+            else {
+                alert("Ошибка при открытии карточки");
+            }
+        }
+
+</script>
+}
