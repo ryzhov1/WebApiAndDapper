@@ -1,0 +1,45 @@
+﻿@{
+    ViewBag.Title = "Тестовое задание";
+}
+<h2>@ViewBag.Title</h2>
+
+<p>Необходимо реализовать импорт контрагентов из файла выписок.</p>
+<p>Описание формата выписок в файле 1C_to_KL.doc</p>
+<p>Пример выписки в файле kl_to_1c_TEST.txt</p>
+<h3>Требования к программе:</h3>
+<ul>
+    <li>Backend: ASP.Net Web API (http://www.asp.net/web-api)</li>
+    <li>Frontend: html, css, js(jquery)</li>
+    <li>БД: MS SQL Server. Для взаимодействия с БД использовать мини orm - dapper</li>
+</ul>
+<h3>Функциональность:</h3>
+<ol>
+    <li>Страница отображения текущего списка контрагентов с возможностью просмотра карточки контрагента. Список контрагентов хранится в БД и изначально пуст.</li>
+    <li>Страничка импорта: выбор и загрузка файла выписки, парсинг контрагентов из файла, предварительный просмотр найденных контрагентов (с возможностью просмотра карточки контрагента как в предыдущем пункте). Если останется время, реализовать поиск дубликатов</li>
+</ol>
+<div>
+    <button id="deleteData">Очистить базу данных</button>
+</div>
+@section scripts
+{
+    <script type="text/javascript">
+
+        $('#deleteData').on('click', function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: '/api/DeleteData/',
+                type: 'DELETE',
+                contentType: "application/json;charset=utf-8",
+                success: function (data) {
+                    $('#deleteData').attr('disabled', 'disabled');
+                    alert(data);
+                },
+                error: function (xhr, status, p3) {
+                    alert(xhr.responseText);
+                }
+                });
+        });
+
+    </script>
+}
