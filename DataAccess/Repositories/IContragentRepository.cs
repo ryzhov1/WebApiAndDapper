@@ -15,5 +15,6 @@ namespace DataAccess.Repositories
         Contragent GetByInn(string inn);
         IEnumerable<Contragent> GetAllContragents();
         void Update(Contragent contragent);
+        IEnumerable<string> GetDuplicatesInn();
     }
 }

@@ -9,6 +9,7 @@ using DataAccess.Repositories;
 
 namespace WebApiTest.Controllers
 {
+    [RoutePrefix("api/Contragents")]
     public class ContragentsController : ApiController
     {
         private readonly IContragentRepository _contragentRepository;
@@ -33,6 +34,13 @@ namespace WebApiTest.Controllers
         public Contragent Get(int id)
         {
             return _contragentRepository.Get(id);
+        }
+
+        [HttpGet]
+        [Route("DuplicatesInn")]
+        public IEnumerable<string> GetDuplicatesInn()
+        {
+            return _contragentRepository.GetDuplicatesInn();
         }
 
         // POST: api/Contragents

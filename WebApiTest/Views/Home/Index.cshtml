@@ -1,4 +1,7 @@
 ﻿<h2>@ViewBag.Title</h2>
+<div>
+    <button id="findDuplicates">Найти дубликаты (по ИНН)</button>
+</div>
 <div id="main-content">
     <div id="tablePreview"></div>
     <div id="datailInfo">
@@ -9,7 +12,7 @@
 </div>
 @section scripts
 {
-<script type="text/javascript">
+    <script type="text/javascript">
         $(document).ready(function () {
 
             Initialize();
@@ -22,6 +25,7 @@
         });
 
         function Initialize() {
+            $("#findDuplicates").css('display', 'none');
             $("#datailInfo").css('display', 'none');
 
             $.ajax({
@@ -47,9 +51,11 @@
 
             var strResult = "<h4>Контрагенты не найдены.</h4>" + '<a href="@Url.Action("Upload")">Перейти к импорту</a>';
             if (contragents.length > 0) {
+                $("#findDuplicates").css('display', 'block');
+
                 strResult = "<table><th>Наименование</th><th>ИНН</th><th>КПП</th><th>&nbsp;</th>";
                 $.each(contragents, function (index, contragent) {
-                    strResult += "<tr><td>" + contragent.Name +
+                    strResult += "<tr class='innTr' data-inn='" + contragent.INN +"'><td>" + contragent.Name +
                         "</td><td> " + contragent.INN +
                         "</td><td>" + contragent.KPP + "</td><td>" +
                         "<a id='detailItem' data-contragent='" + JSON.stringify(contragent) + "' onclick='DetailItem(this);' >Карточка</a></td></tr>";
@@ -123,5 +129,37 @@
             }
         }
 
-</script>
+        $('#findDuplicates').on('click', function (e) {
+            e.preventDefault();
+
+            $.ajax({
+                url: '/api/contragents/DuplicatesInn',
+                type: 'GET',
+                dataType: 'json',
+                success: function (data) {
+                    $('#findDuplicates').attr('disabled', 'disabled');
+                    FindDuplicatesInn(data);
+                },
+                error: function (xhr, status, p3) {
+                    alert(xhr.responseText);
+                }
+            });
+        });
+
+        function FindDuplicatesInn(dataArray) {
+            var isFinded = false;
+            $('.innTr').each(function () {
+                var dataInn = $(this).data('inn').toString();
+       
+                if (dataArray.indexOf(dataInn) != -1) {
+                    $('.innTr[data-inn="' + dataInn + '"]').css('color', 'red');
+                    isFinded = true;
+                }
+            });
+
+            if (!isFinded)
+              alert("Дубликаты не найдены.");
+        }
+
+    </script>
 }

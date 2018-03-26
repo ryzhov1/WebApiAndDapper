@@ -68,5 +68,18 @@ namespace DataAccess.Repositories
                 return db.Query<Contragent>("SELECT * FROM Contragents WHERE Inn = @Inn", new { inn }).FirstOrDefault();
             }
         }
+
+        public IEnumerable<string> GetDuplicatesInn()
+        {
+            var sqlQuery = @"select inn
+                             from Contragents
+                             group by inn
+                             having count(inn) > 1";
+
+            using (IDbConnection db = _connectionFactory.GetConnection)
+            {
+                return db.Query<string>(sqlQuery);
+            }
+        }
     }
 }
